@@ -105,10 +105,7 @@ const ProductForm: React.FC = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-md mx-auto mt-8 p-4 border border-gray-300 rounded my-3"
-    >
+    <div className="max-w-md mx-auto mt-8 p-4 border border-gray-300 rounded my-3">
       <h2 className="text-2xl font-semibold mb-4 text-center">Add Product</h2>
 
       <div className="mb-4">
@@ -226,7 +223,7 @@ const ProductForm: React.FC = () => {
       <ImageUpload setImageUrls={setImageUrl} />
       {/*================== <ImageUpload /> Image========================== */}
       <button
-        type="submit"
+        onClick={handleSubmit}
         disabled={isLoading}
         className={`bg-blue-500 text-white py-2 px-4 rounded ${
           isLoading && " opacity-60 "
@@ -234,7 +231,7 @@ const ProductForm: React.FC = () => {
       >
         Submit
       </button>
-    </form>
+    </div>
   );
 };
 
