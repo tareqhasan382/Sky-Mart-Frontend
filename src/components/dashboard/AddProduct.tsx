@@ -8,7 +8,7 @@ import { useAddProductMutation } from "../../redux/api/productApi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../../utils/local-storage";
-// import Size from "./Size";
+import Size from "./Size";
 interface Variation {
   color: string;
   size: string[];
@@ -48,8 +48,9 @@ const ProductForm: React.FC = () => {
     price: 0,
     userId: "6585d731059c95c9677c0ce8",
     image: [""],
-    variations: [{ color: "#fe345e", size: ["m"] }],
+    variations: [{ color: "#fe345e", size: [] }],
   });
+  // console.log("data:", formData.variations);
   // ========Image Upload=============
   const [imageUrl, setImageUrl] = useState<string[]>([]);
   useEffect(() => {
@@ -72,21 +73,17 @@ const ProductForm: React.FC = () => {
     updatedVariations[index].color = color.hex;
     setFormData((prevData) => ({ ...prevData, variations: updatedVariations }));
   };
-
-  const handleSizeChange = (
-    index: number,
-    sizeIndex: number,
-    value: string
-  ) => {
-    const updatedVariations = [...formData.variations];
-    updatedVariations[index].size[sizeIndex] = value;
-    setFormData((prevData) => ({ ...prevData, variations: updatedVariations }));
+  const handleSizeChange = (sizes: string[], index: number) => {
+    setFormData((prevData) => {
+      const newVariations = [...prevData.variations];
+      newVariations[index].size = sizes;
+      return { ...prevData, variations: newVariations };
+    });
   };
-
   const handleAddVariation = () => {
     setFormData((prevData) => ({
       ...prevData,
-      variations: [...prevData.variations, { color: "", size: ["m"] }],
+      variations: [...prevData.variations, { color: "", size: [] }],
     }));
   };
 
@@ -101,7 +98,7 @@ const ProductForm: React.FC = () => {
     try {
       addProduct(formData);
       toast.success("Product added .");
-      console.log("Form data submitted:", formData);
+      //console.log("Form data submitted:", formData);
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -182,6 +179,7 @@ const ProductForm: React.FC = () => {
                 backgroundColor: variation.color,
                 display: "inline-block",
               }}
+              className=" outline outline-1 outline-red-600 rounded-md "
             ></p>
             {colorPickerVisible && selectedColorIndex === index && (
               <div className="absolute z-10">
@@ -192,32 +190,29 @@ const ProductForm: React.FC = () => {
               </div>
             )}
           </div>
-          <label className="block mt-4 mb-2 font-semibold">Sizes</label>
-          {variation.size.map((size, sizeIndex) => (
-            <input
-              key={sizeIndex}
-              type="text"
-              value={size}
-              onChange={(e) =>
-                handleSizeChange(index, sizeIndex, e.target.value)
-              }
-              className="w-full p-2 border border-gray-300 rounded mb-2"
-              required
-            />
-          ))}
+          <div>
+            <label className="mb-2 flex">
+              Sizes:
+              <Size
+                selectedSizes={variation.size}
+                onSizeChange={(sizes) => handleSizeChange(sizes, index)}
+                setFormData={setFormData}
+              />
+            </label>
+          </div>
           {/* <Size setFormData={setFormData} /> //====================SIze */}
           <button
             type="button"
             onClick={() => handleAddVariation()}
-            className="text-blue-500 underline cursor-pointer"
+            className="text-white cursor-pointer px-2 py-1 bg-blue-500 rounded "
           >
-            Add Size
+            Add Variation
           </button>
           {formData.variations.length > 1 && (
             <button
               type="button"
               onClick={() => handleRemoveVariation(index)}
-              className="text-red-500 underline cursor-pointer ml-2"
+              className=" ml-2 text-white cursor-pointer px-2 py-1 bg-red-500 rounded"
             >
               Remove Variation
             </button>

@@ -111,8 +111,16 @@ const ProductDetails = () => {
                   <div key={index}>
                     <p
                       className={`${
-                        selectedColor == index ? " bg-black text-white " : ""
+                        selectedColor == index
+                          ? " text-white h-[20px] w-[20px] rounded-full outline outline-2 outline-black cursor-pointer "
+                          : ""
                       } mx-1 `}
+                      style={{
+                        backgroundColor: x?.color,
+                        display: "inline-block",
+                        cursor: "pointer",
+                        outlineColor: "black",
+                      }}
                       onClick={() => handleColor(index)}
                     >
                       {x?.color}
