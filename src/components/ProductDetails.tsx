@@ -5,19 +5,18 @@ import { IVariation } from "../types/common";
 import { useAppDispatch } from "../redux/hooks";
 import { toast } from "react-toastify";
 import { IProduct, addToCart } from "../redux/cardSlice";
-// import { IProducts } from "../types/common";
+import { FaCheckCircle } from "react-icons/fa";
 
 const ProductDetails = () => {
   const dispatch = useAppDispatch();
-  //const [cart, setCart] = useState<ICartItem[]>([]);
-  //console.log("Cart:", cart);
+
   const [thumimage, setThumimage] = useState<number>(0);
   const [selectedColor, setSelectedColor] = useState<number>(0);
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const { id } = useParams();
   const { data, isLoading } = useProductDetailsQuery(id);
   const product = data?.data;
-  console.log("product:", product);
+  // console.log("product:", product);
   const thumbnil = (index: number) => {
     setThumimage(index);
   };
@@ -32,7 +31,7 @@ const ProductDetails = () => {
     // Check if a size and color are selected
     if (selectedSize !== null && selectedColor !== null) {
       const newItem: IProduct = {
-        productId: product?._id, // Replace with actual product ID
+        productId: product?._id,
         name: product?.name,
         size: product?.variations[selectedColor].size[selectedSize],
         color: product?.variations[selectedColor]?.color,
@@ -41,10 +40,8 @@ const ProductDetails = () => {
         // Add other product details as needed
       };
 
-      //  setCart([...cart, newItem]);
       dispatch(addToCart(newItem));
     } else {
-      // Handle case where size or color is not selected
       toast.warning("Please select size and color before adding to cart.");
     }
   };
@@ -105,16 +102,11 @@ const ProductDetails = () => {
                 Available : {product?.stock > 0 ? " In Stock" : "Not Available"}
               </h3>
               <div className=" text-sm font-semibold flex items-center ">
-                {/* color :{product?.variations?.color[0]} */}Color:
-                {/* {product?.variations[0].color} */}
+                Color:
                 {product?.variations.map((x: IVariation, index: number) => (
-                  <div key={index}>
+                  <div key={index} className=" my-3 ">
                     <p
-                      className={`${
-                        selectedColor == index
-                          ? " text-white h-[20px] w-[20px] rounded-full outline outline-2 outline-black cursor-pointer "
-                          : ""
-                      } mx-1 `}
+                      className="cursor-pointer mx-2 rounded-full w-[25px] h-[25px] outline outline-2 outline-black"
                       style={{
                         backgroundColor: x?.color,
                         display: "inline-block",
@@ -123,12 +115,28 @@ const ProductDetails = () => {
                       }}
                       onClick={() => handleColor(index)}
                     >
-                      {x?.color}
+                      {selectedColor === index ? (
+                        <>
+                          <FaCheckCircle
+                            style={{
+                              //color: x?.color,
+                              color: "white",
+                              display: "inline-block",
+                              cursor: "pointer",
+                              outlineColor: "black",
+                            }}
+                            className="bg-green-600 rounded-full"
+                            size={25}
+                          />
+                        </>
+                      ) : (
+                        ""
+                      )}
                     </p>
                   </div>
                 ))}
               </div>
-              <div className="text-sm font-semibold flex items-center gap-3">
+              <div className="text-sm font-semibold flex items-center gap-2 ">
                 Size:
                 {product?.variations[selectedColor].size.map(
                   (size: string, index: number) => (
@@ -136,7 +144,9 @@ const ProductDetails = () => {
                       <p
                         onClick={() => handleSize(index)}
                         className={`${
-                          selectedSize === index ? "bg-black text-white" : ""
+                          selectedSize === index
+                            ? "bg-black text-white px-1 rounded-md "
+                            : ""
                         } mx-1 cursor-pointer`}
                       >
                         {size}

@@ -171,12 +171,10 @@ const ProductForm: React.FC = () => {
             />
             <p
               style={{
-                width: "300px",
-                height: "15px",
                 backgroundColor: variation.color,
                 display: "inline-block",
               }}
-              className=" outline outline-1 outline-red-600 rounded-md "
+              className=" w-full h-[15px] outline outline-1 outline-red-600 rounded-md "
             ></p>
             {colorPickerVisible && selectedColorIndex === index && (
               <div className="absolute z-10">
