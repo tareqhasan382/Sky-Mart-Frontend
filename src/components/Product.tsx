@@ -1,22 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link } from "react-router-dom";
 import { useGetProductsQuery } from "../redux/api/productApi";
-// import { IProducts } from "../types/common";
-import { useSelector } from "react-redux";
+import {
+  minPrixe,
+  maxPrixe,
+  selectSortField,
+  selectSortOrder,
+} from "../redux/api/filterSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
 const Product: React.FC = () => {
-  // page, limit, search, filterField, sortOrder, sortField
+  // page, limit, search, filterField, sortOrder, sortField  ||  color, size, price, name, sortOrder, sortField,
+  const dispatch = useDispatch();
   // ?sortField=date&sortOrder=-1
   const query: Record<string, any> = {};
-  const { tags } = useSelector((state: RootState) => state.filter);
+  const { tags, size, color, maxPrice, minPrice, sortField, sortOrder } =
+    useSelector((state: RootState) => state.filter);
   // query["name"] = search;
   query["name"] = tags;
-
+  query["color"] = color;
+  query["size"] = size;
+  query["minPrice"] = minPrice;
+  query["maxPrice"] = maxPrice;
+  query["sortBy"] = sortField;
+  query["sortOrder"] = sortOrder;
+  // ?sortBy=price&sortOrder=-1
   const { data, isLoading } = useGetProductsQuery({ ...query });
   const products = data?.data;
   //console.log("data count:", products?.length);
   console.log("products:", products);
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedSortOption = e.target.value;
+    dispatch(selectSortField("price"));
+    dispatch(selectSortOrder(selectedSortOption));
+  };
+  // (selectedSortOption);
   return (
     <div className=" bg-gray-100 px-1 lg:flex gap:[1%] justify-between h-full rounded-md ">
       <div className=" lg:w-[18%]  ">
@@ -27,12 +46,19 @@ const Product: React.FC = () => {
               Sort By
             </label>
             <select
-              className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline"
+              onChange={handleSortChange}
+              className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline cursor-pointer "
               id="sort"
             >
-              <option value="">Default </option>
-              <option value="asc">Price (Low to High)</option>
-              <option value="desc">Price (Hign to Low)</option>
+              <option value="" className=" cursor-pointer ">
+                Default{" "}
+              </option>
+              <option value="asc" className=" cursor-pointer ">
+                Price (Low to High)
+              </option>
+              <option value="desc" className=" cursor-pointer ">
+                Price (Hign to Low)
+              </option>
             </select>
           </div>
           <h3 className=" font-semibold ">Price Range</h3>
@@ -40,28 +66,21 @@ const Product: React.FC = () => {
           <div className=" flex gap-2 items-center py-2 ">
             <input
               type="number"
+              onChange={(e) => dispatch(minPrixe(Number(e.target.value)))}
               placeholder="min"
-              className=" p-2 w-[70px] rounded "
+              defaultValue={minPrice}
+              className=" p-2 w-[80px] rounded "
             />
             <p className=" text-xl font-bold ">-</p>
             <input
               type="number"
               placeholder="max"
-              className=" p-2 w-[70px] rounded "
+              defaultValue={maxPrice}
+              onChange={(e) => dispatch(maxPrixe(Number(e.target.value)))}
+              className=" p-2 w-[80px] rounded "
             />
           </div>
-          {/* ram */}
-          <div>
-            <label htmlFor="ram" className="font-semibold py-2 ">
-              Price
-            </label>
-            <select
-              className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline"
-              id="ram"
-            >
-              <option value="">Default</option>
-            </select>
-          </div>
+
           {/* Internal Storage */}
           <div className=" py-2 ">
             <label htmlFor="memor" className="font-semibold py-2 ">
@@ -96,10 +115,11 @@ const Product: React.FC = () => {
                 Sort By
               </label>
               <select
-                className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline"
+                onChange={handleSortChange}
+                className="block appearance-none  lg:w-full w-[70px] bg-white border border-gray-300 text-gray-700 py-2 px-1  rounded leading-tight focus:outline-none focus:shadow-outline"
                 id="sort"
               >
-                <option value="">Default sorting </option>
+                <option value="">Default</option>
                 <option value="asc">Price (Low to High)</option>
                 <option value="desc">Price (Hign to Low)</option>
               </select>
@@ -111,13 +131,17 @@ const Product: React.FC = () => {
                 <input
                   type="number"
                   placeholder="min"
-                  className=" p-2 w-[70px] rounded "
+                  onChange={(e) => dispatch(minPrixe(Number(e.target.value)))}
+                  defaultValue={minPrice}
+                  className=" p-1 w-[80px] rounded outline outline-1 outline-gray-400  "
                 />
                 <p className=" text-xl font-bold ">-</p>
                 <input
                   type="number"
                   placeholder="max"
-                  className=" p-2 w-[70px] rounded "
+                  onChange={(e) => dispatch(maxPrixe(Number(e.target.value)))}
+                  defaultValue={maxPrice}
+                  className=" p-1 w-[100px] rounded outline outline-1 outline-gray-400 "
                 />
               </div>
             </div>
@@ -126,7 +150,7 @@ const Product: React.FC = () => {
             {/* ram */}
             <div>
               <label htmlFor="ram" className="font-semibold py-2 ">
-                Price
+                Size
               </label>
               <select
                 className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline"
