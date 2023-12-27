@@ -2,8 +2,12 @@
 import { Link } from "react-router-dom";
 import { useGetProductsQuery } from "../redux/api/productApi";
 import {
-  minPrixe,
+  tagSelect,
+  searchfilter,
   maxPrixe,
+  minPrixe,
+  selectColor,
+  selectSize,
   selectSortField,
   selectSortOrder,
 } from "../redux/api/filterSlice";
@@ -52,19 +56,38 @@ const Product: React.FC = () => {
     setUniqueColorArray(Array.from(uniqueColors));
   }, [products]);
   const handleColor = (color: string) => {
+    setSelectedSize("");
     setSelectedColor(color);
     //console.log("setSelectedColor:", color);
   };
   const handleSize = (size: string) => {
+    setSelectedColor("");
     setSelectedSize(size.toLowerCase());
 
     //console.log("setSelectedColor:", size.toLowerCase());
   };
+
+  const handleClearFilter = () => {
+    setSelectedColor("");
+    setSelectedSize("");
+    tagSelect("");
+    searchfilter("");
+    selectColor("");
+    selectSize("");
+    dispatch(tagSelect(""));
+  };
+
   return (
     <div className=" bg-gray-100 px-1 lg:flex gap:[1%] justify-between h-full rounded-md ">
       <div className=" lg:w-[18%]  ">
         <div className=" px-1 hidden md:block ">
           {/* sort by */}
+          <button
+            onClick={handleClearFilter}
+            className=" my-3 bg-blue-500 text-white px-3 py-1 rounded "
+          >
+            Clear All Filter
+          </button>
           <div className=" py-2 ">
             <label htmlFor="sort" className="font-semibold">
               Sort By
@@ -92,14 +115,12 @@ const Product: React.FC = () => {
               type="number"
               onChange={(e) => dispatch(minPrixe(Number(e.target.value)))}
               placeholder="min"
-              defaultValue={minPrice}
               className=" p-2 w-[80px] rounded "
             />
             <p className=" text-xl font-bold ">-</p>
             <input
               type="number"
               placeholder="max"
-              defaultValue={maxPrice}
               onChange={(e) => dispatch(maxPrixe(Number(e.target.value)))}
               className=" p-2 w-[80px] rounded "
             />
@@ -153,6 +174,12 @@ const Product: React.FC = () => {
         </div>
         <details className=" px-1 md:hidden transition duration-150 ease-in ">
           <summary>Sort and Filtering</summary>
+          <button
+            onClick={handleClearFilter}
+            className=" my-3 bg-blue-500 text-white px-3 py-1 rounded "
+          >
+            Clear All Filter
+          </button>
           <div className=" flex gap-2 ">
             {/* sort by */}
             <div className=" py-2 ">
@@ -169,7 +196,7 @@ const Product: React.FC = () => {
                 <option value="desc">Price (Hign to Low)</option>
               </select>
             </div>
-            <div>
+            <div className=" py-2 ">
               <h3 className=" font-semibold ">Price Range</h3>
               {/* price Range */}
               <div className=" flex gap-2 items-center py-2 ">
@@ -177,7 +204,6 @@ const Product: React.FC = () => {
                   type="number"
                   placeholder="min"
                   onChange={(e) => dispatch(minPrixe(Number(e.target.value)))}
-                  defaultValue={minPrice}
                   className=" p-1 w-[80px] rounded outline outline-1 outline-gray-400  "
                 />
                 <p className=" text-xl font-bold ">-</p>
@@ -185,7 +211,6 @@ const Product: React.FC = () => {
                   type="number"
                   placeholder="max"
                   onChange={(e) => dispatch(maxPrixe(Number(e.target.value)))}
-                  defaultValue={maxPrice}
                   className=" p-1 w-[100px] rounded outline outline-1 outline-gray-400 "
                 />
               </div>
