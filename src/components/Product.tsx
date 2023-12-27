@@ -70,11 +70,13 @@ const Product: React.FC = () => {
   const handleClearFilter = () => {
     setSelectedColor("");
     setSelectedSize("");
-    tagSelect("");
-    searchfilter("");
+    dispatch(tagSelect(""));
+    dispatch(searchfilter(""));
     selectColor("");
     selectSize("");
     dispatch(tagSelect(""));
+    dispatch(maxPrixe(10000));
+    dispatch(minPrixe(0));
   };
 
   return (
