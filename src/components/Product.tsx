@@ -7,13 +7,18 @@ import {
   selectSortField,
   selectSortOrder,
 } from "../redux/api/filterSlice";
+import { FaCheck } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-
+import { useEffect, useState } from "react";
+import { SizesArray } from "../constant/Sizes";
+const uniqueColors = new Set<string>();
 const Product: React.FC = () => {
-  // page, limit, search, filterField, sortOrder, sortField  ||  color, size, price, name, sortOrder, sortField,
+  const [uniqueColorArray, setUniqueColorArray] = useState<string[]>([]);
+  const [selectedColor, setSelectedColor] = useState<string>();
+  const [selectedSize, setSelectedSize] = useState<string>();
   const dispatch = useDispatch();
-  // ?sortField=date&sortOrder=-1
+
   const query: Record<string, any> = {};
   const { tags, size, color, maxPrice, minPrice, sortField, sortOrder } =
     useSelector((state: RootState) => state.filter);
@@ -25,17 +30,36 @@ const Product: React.FC = () => {
   query["maxPrice"] = maxPrice;
   query["sortBy"] = sortField;
   query["sortOrder"] = sortOrder;
-  // ?sortBy=price&sortOrder=-1
+  query["color"] = selectedColor;
+  query["size"] = selectedSize;
   const { data, isLoading } = useGetProductsQuery({ ...query });
   const products = data?.data;
-  //console.log("data count:", products?.length);
-  console.log("products:", products);
+
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedSortOption = e.target.value;
     dispatch(selectSortField("price"));
     dispatch(selectSortOrder(selectedSortOption));
   };
-  // (selectedSortOption);
+  useEffect(() => {
+    // Iterate through products to extract unique colors
+    products?.forEach((product: any) => {
+      product?.variations?.forEach((variation: any) => {
+        uniqueColors.add(variation.color);
+      });
+    });
+
+    // Convert the set to an array for rendering
+    setUniqueColorArray(Array.from(uniqueColors));
+  }, [products]);
+  const handleColor = (color: string) => {
+    setSelectedColor(color);
+    //console.log("setSelectedColor:", color);
+  };
+  const handleSize = (size: string) => {
+    setSelectedSize(size.toLowerCase());
+
+    //console.log("setSelectedColor:", size.toLowerCase());
+  };
   return (
     <div className=" bg-gray-100 px-1 lg:flex gap:[1%] justify-between h-full rounded-md ">
       <div className=" lg:w-[18%]  ">
@@ -51,7 +75,7 @@ const Product: React.FC = () => {
               id="sort"
             >
               <option value="" className=" cursor-pointer ">
-                Default{" "}
+                Default
               </option>
               <option value="asc" className=" cursor-pointer ">
                 Price (Low to High)
@@ -81,29 +105,50 @@ const Product: React.FC = () => {
             />
           </div>
 
-          {/* Internal Storage */}
+          {/* Color manage */}
           <div className=" py-2 ">
-            <label htmlFor="memor" className="font-semibold py-2 ">
-              Color
-            </label>
-            <select
-              className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline"
-              id="memorySize"
-            >
-              <option value="">Default</option>
-            </select>
+            <p className="font-semibold py-2 ">Colors</p>
+            <div className=" flex flex-wrap gap-2  ">
+              {uniqueColorArray?.map((color, index) => (
+                <div key={index}>
+                  <p
+                    onClick={() => handleColor(color)}
+                    className="w-[40px] h-[40px] rounded-xl bg-black cursor-pointer border-[0.5px] border-black shadow-md items-center justify-center"
+                    style={{ backgroundColor: color }}
+                  >
+                    {selectedColor === color ? (
+                      <>
+                        <FaCheck
+                          className=" m-2 text-green-600 opacity-100 rounded-md bg-slate-200 "
+                          size={20}
+                        />
+                      </>
+                    ) : (
+                      ""
+                    )}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-          {/* Battery */}
+          {/*  Size manage */}
           <div className=" py-2 ">
-            <label htmlFor="battery" className="font-semibold py-2 ">
-              Size
-            </label>
-            <select
-              className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline"
-              id="memorySize"
-            >
-              <option value="">Default</option>
-            </select>
+            <p className="font-semibold py-2 ">Sizes</p>
+
+            <div className=" flex flex-wrap gap-2 ">
+              {SizesArray.map((size: any, index: number) => (
+                <button
+                  onClick={() => handleSize(size)}
+                  key={index}
+                  className={`${
+                    selectedSize?.toLocaleUpperCase() === size &&
+                    " bg-black text-white  "
+                  } border-[0.5px] border-black rounded-xl text-center text-[14px] text-black p-2 cursor-pointer`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         <details className=" px-1 md:hidden transition duration-150 ease-in ">
@@ -146,30 +191,51 @@ const Product: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className=" flex gap-3 items-center ">
-            {/* ram */}
-            <div>
-              <label htmlFor="ram" className="font-semibold py-2 ">
-                Size
-              </label>
-              <select
-                className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline"
-                id="ram"
-              >
-                <option value="">Default</option>
-              </select>
-            </div>
-            {/* Internal Storage */}
+          <div className=" ">
+            {/* Color manage */}
             <div className=" py-2 ">
-              <label htmlFor="memor" className="font-semibold py-2 ">
-                Color
-              </label>
-              <select
-                className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline"
-                id="memorySize"
-              >
-                <option value="">Default</option>
-              </select>
+              <p className="font-semibold py-2 ">Colors</p>
+              <div className=" flex flex-wrap gap-2  ">
+                {uniqueColorArray?.map((color, index) => (
+                  <div key={index}>
+                    <p
+                      onClick={() => handleColor(color)}
+                      className="w-[40px] h-[40px] rounded-xl bg-black cursor-pointer border-[0.5px] border-black shadow-md items-center justify-center"
+                      style={{ backgroundColor: color }}
+                    >
+                      {selectedColor === color ? (
+                        <>
+                          <FaCheck
+                            className=" m-2 text-green-600 opacity-100 rounded-md bg-slate-200 "
+                            size={20}
+                          />
+                        </>
+                      ) : (
+                        ""
+                      )}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/*  Size manage */}
+            <div className=" py-2 ">
+              <p className="font-semibold py-2 ">Sizes</p>
+
+              <div className=" flex flex-wrap gap-2 ">
+                {SizesArray.map((size: any, index: number) => (
+                  <button
+                    onClick={() => handleSize(size)}
+                    key={index}
+                    className={`${
+                      selectedSize?.toLocaleUpperCase() === size &&
+                      " bg-black text-white  "
+                    } border-[0.5px] border-black rounded-xl text-center text-[14px] text-black p-2 cursor-pointer`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
           {/* Battery */}
@@ -199,8 +265,8 @@ const Product: React.FC = () => {
               >
                 <img
                   src={item?.image[0]}
-                  alt="phone"
-                  className=" h-[170px] object-fill rounded mb-3 "
+                  alt="img"
+                  className=" h-[170px] object-cover  rounded mb-3 "
                 />
                 <div className=" lg:h-[100px] md:h-[200px] ">
                   <Link to={`/productDetails/${item._id}`}>

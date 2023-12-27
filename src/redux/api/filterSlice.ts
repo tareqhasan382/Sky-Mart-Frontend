@@ -10,7 +10,7 @@ interface FilterState {
   sortOrder: string;
   sortField: string;
 }
-
+// ?sortBy=price&sortOrder=-1
 const initialState: FilterState = {
   tags: "",
   search: "",
